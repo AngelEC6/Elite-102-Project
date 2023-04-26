@@ -44,7 +44,7 @@ def admin_ID_menu():
             print("\n\n\n\nThat wasn't a number please try again.")
             os.system('cls')
     passed = check_id(admin_id_input,"admin")
-    #os.system('cls')
+    os.system('cls')
     if passed == True:
         admin_pin_menu(user_id_input)
     elif user_id_input == "Back":
@@ -59,7 +59,7 @@ def admin_ID_menu():
                     return "null"
                 admin_id_input = int(admin_id_input)
                 passed = check_id(admin_id_input,"admin")
-                #os.system('cls')
+                os.system('cls')
                 if passed == True:
                     break   
             except ValueError:
@@ -68,7 +68,7 @@ def admin_ID_menu():
                 os.system('cls')
         admin_pin_menu(admin_id_input)
 
-def admin_pin_menu(acount_number):
+def admin_pin_menu():
     while True:
         try:
             print(top_logo)
@@ -77,10 +77,12 @@ def admin_pin_menu(acount_number):
             if admin_pin_input == "back":
                 return "null"
             admin_pin_input = int(admin_pin_input)
-            passed = check_pin(admin_pin_input,acount_number,"admin")
+            passed = check_pin(admin_pin_input,000000,"admin")
             if passed == True:
                 admin_menu()
                 return "void"
+            elif passed == False:
+                break
         except ValueError:
             print(top_logo)
             print("\n\n\n\nThat's not a number please try again")
@@ -95,7 +97,8 @@ def admin_pin_menu(acount_number):
                     if admin_pin_input == "back":
                         return "null"
                     admin_pin_input = int(admin_pin_input)
-                    passed = check_pin(admin_pin_input,acount_number,"admin")
+                    passed = check_pin(admin_pin_input,000000,"admin")
+                    print(passed)
                     if passed == True:
                         break
                 admin_menu()
@@ -111,11 +114,11 @@ def admin_menu():
         admin_choice = input("\n\n\n\nWhat would you like to do (open, close, or modify an acount)?: ")
         os.system('cls')
         if admin_choice == "open":
-            admin_open_menu()
+            create_new_acount_menu("admin")
         elif admin_choice == "close":
             admin_close_menu()
         elif admin_choice == "modify":
-            admin_modify_menu()
+            admin_acount_choice_modify_menu()
         elif admin_choice == "back":
             break
         else:
@@ -130,7 +133,7 @@ def admin_menu():
                     admin_close_menu()
                     break
                 elif admin_choice == "modify":
-                    admin_modify_menu()
+                    admin_acount_choice_modify_menu()
                     break
                 elif admin_choice == "back":
                     return "null"
@@ -243,6 +246,7 @@ def modify_acount_number_menu(acount_number):
             print(top_logo)
             new_acount_number = int(input("\n\n\n\nWhat would you like the acount's new number to be?: "))
             os.system('cls')
+            break
         except ValueError:
             print(top_logo)
             print("\n\n\n\nThat is not a number please try again.")
@@ -264,6 +268,7 @@ def modify_pin_menu(acount_number):
             print(top_logo)
             new_acount_pin = int(input("\n\n\n\nWhat would you like the acount's new pin to be?: "))
             os.system('cls')
+            break
         except ValueError:
             print(top_logo)
             print("\n\n\n\nThat is not a number please try again.")
@@ -279,7 +284,20 @@ def modify_acount_pin(acount_number,new_acount_pin):
     modify_acount_pin_cursor.execute(modify_acount_pin_code)
     modify_acount_pin_cursor.close()
 
+def modify_name_menu(acount_number):
+    print(top_logo)
+    new_acount_name = input("\n\n\n\nWhat would you like the acount's new name to be?: ")
+    os.system('cls')
+    modify_acount_name(acount_number,new_acount_name)
+    print(top_logo)
+    input("\n\n\n\nThe acount has been modified succesfuly please press enter once you're done: ")
+    os.system('cls')
 
+def modify_acount_name(acount_number,new_acount_name):
+    modify_acount_name_cursor = connection.cursor()
+    modify_acount_name_code = ("UPDATE acountinfo SET username = '" + new_acount_name + "' WHERE idnumber = " + str(acount_number))
+    modify_acount_name_cursor.execute(modify_acount_name_code)
+    modify_acount_name_cursor.close()
 
 def new_acount_menu():
     print(top_logo)
@@ -327,7 +345,7 @@ def get_user_name(menu_type):
         new_user_name = input("\n\n\n\nEnter your name: ")
         os.system('cls')
         return new_user_name
-    elif main_menu == "admin":
+    elif menu_type == "admin":
         print(top_logo)
         new_user_name = input("\n\n\n\nEnter the name the acount will be under: ")
         os.system('cls')
@@ -545,6 +563,17 @@ def check_pin(user_input,acount_number,check_type):
         else:
             check_pin_cursor.close()
             return False
+    elif check_type == "admin":
+        check_pin_cursor = connection.cursor()
+        get_pin = ("SELECT pin FROM acountinfo WHERE idnumber = 23568")
+        check_pin_cursor.execute(get_pin)
+        pin = check_pin_cursor.fetchall()
+        if pin[0][0] == user_input:
+            check_pin_cursor.close()
+            return True
+        else:
+            check_pin_cursor.close()
+            return False
     
 
 def check_id(user_input,check_type):
@@ -576,7 +605,7 @@ while True:
     next_menu = main_menu()
     #os.system('cls')
     if next_menu == "administrator":
-        admin_menu()
+        admin_pin_menu()
     elif next_menu == "user":
         user_type = check_user_type()
         if user_type == "new":
